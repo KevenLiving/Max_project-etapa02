@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Banco - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-cog text-warning me-2"></i>
+            Gerenciar Banco de Dados
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-database me-2"></i>
+                    Limpeza do Banco de Dados
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Atenção!
+                    </h6>
+                    <p>Esta ação irá remover produtos do banco de dados e não pode ser desfeita.</p>
+                    <ul class="mb-0">
+                        <li>Digite <strong>"tudo"</strong> para limpar todos os produtos</li>
+                        <li>Digite um <strong>termo específico</strong> para remover apenas produtos daquela busca</li>
+                        <li>Buscas órfãs (sem produtos) serão automaticamente removidas</li>
+                    </ul>
+                </div>
+
+                <form method="POST" action="{{ url_for('limpar_banco') }}" id="clean-form">
+                    <div class="mb-3">
+                        <label for="termo" class="form-label">
+                            <i class="fas fa-tag me-1"></i>
+                            Termo para Limpeza
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="termo" 
+                               name="termo" 
+                               placeholder="Digite 'tudo' ou o termo específico..."
+                               required>
+                        <div class="form-text">
+                            Exemplos: "tudo", "smartphone", "notebook"
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg" id="clean-btn">
+                            <i class="fas fa-trash me-2"></i>
+                            Limpar Banco de Dados
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações do Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-server fa-2x text-primary mb-2"></i>
+                                <h6>Status da API</h6>
+                                <div id="api-status-detail">
+                                    <span class="badge bg-secondary">Verificando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-flask fa-2x text-success mb-2"></i>
+                                <h6>Interface Flask</h6>
+                                <span class="badge bg-success">Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Ações Administrativas:</h6>
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ url_for('produtos') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-1"></i>
+                                Ver Produtos
+                            </a>
+                            <a href="{{ url_for('buscas') }}" class="btn btn-outline-info">
+                                <i class="fas fa-history me-1"></i>
+                                Histórico
+                            </a>
+                            <a href="{{ url_for('buscar') }}" class="btn btn-outline-success">
+                                <i class="fas fa-search me-1"></i>
+                                Nova Busca
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <h6 class="alert-heading">
+                <i class="fas fa-lightbulb me-2"></i>
+                Dicas de Gerenciamento
+            </h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li>Limpe regularmente para economizar espaço</li>
+                        <li>Mantenha apenas buscas recentes e relevantes</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li>Verifique o status da API antes de fazer buscas</li>
+                        <li>Use termos específicos para limpeza seletiva</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Verificar status da API com mais detalhes
+function checkDetailedApiStatus() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            const statusDiv = document.getElementById('api-status-detail');
+            
+            if (data.status === 'online') {
+                statusDiv.innerHTML = '<span class="badge bg-success">Online</span>';
+            } else if (data.status === 'error') {
+                statusDiv.innerHTML = '<span class="badge bg-warning">Com Erro</span>';
+            } else {
+                statusDiv.innerHTML = '<span class="badge bg-danger">Offline</span>';
+            }
+        })
+        .catch(error => {
+            const statusDiv = document.getElementById('api-status-detail');
+            statusDiv.innerHTML = '<span class="badge bg-danger">Offline</span>';
+        });
+}
+
+// Confirmação de limpeza
+document.getElementById('clean-form').addEventListener('submit', function(e) {
+    const termo = document.getElementById('termo').value.toLowerCase();
+    let message;
+    
+    if (termo === 'tudo') {
+        message = 'Tem certeza que deseja remover TODOS os produtos do banco de dados? Esta ação não pode ser desfeita!';
+    } else {
+        message = `Tem certeza que deseja remover todos os produtos da busca "${termo}"?`;
+    }
+    
+    if (!confirm(message)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Mostrar loading
+    const btn = document.getElementById('clean-btn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Limpando...';
+    btn.disabled = true;
+});
+
+// Verificar status detalhado ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    checkDetailedApiStatus();
+    setInterval(checkDetailedApiStatus, 30000);
+});
+</script>
+{% endblock %}

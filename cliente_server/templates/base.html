@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mercado Livre Scraper{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .rating {
+            color: #ffc107;
+        }
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .product-card {
+            height: 100%;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+        .card-text {
+            flex-grow: 1;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Status da API -->
+    <div id="api-status" class="status-indicator">
+        <span class="badge bg-secondary">
+            <i class="fas fa-circle" id="status-icon"></i>
+            <span id="status-text">Verificando...</span>
+        </span>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-shopping-cart me-2"></i>
+                ML Scraper
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('buscar') }}">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-list me-1"></i>Produtos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('produtos') }}">Todos os Produtos</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('melhores_precos') }}">Melhores Preços</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('melhores_avaliados') }}">Melhores Avaliados</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('custo_beneficio') }}">Custo-Benefício</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('buscas') }}">
+                            <i class="fas fa-history me-1"></i>Histórico
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('gerenciar') }}">
+                            <i class="fas fa-cog me-1"></i>Gerenciar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mensagens Flash -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mt-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                <i class="fas fa-code me-1"></i>
+                Mercado Livre Scraper - Interface Flask
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Verificar status da API
+        function checkApiStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusIcon = document.getElementById('status-icon');
+                    const statusText = document.getElementById('status-text');
+                    const statusBadge = document.getElementById('api-status').querySelector('.badge');
+                    
+                    if (data.status === 'online') {
+                        statusIcon.className = 'fas fa-circle text-success';
+                        statusText.textContent = 'API Online';
+                        statusBadge.className = 'badge bg-success';
+                    } else {
+                        statusIcon.className = 'fas fa-circle text-danger';
+                        statusText.textContent = 'API Offline';
+                        statusBadge.className = 'badge bg-danger';
+                    }
+                })
+                .catch(error => {
+                    const statusIcon = document.getElementById('status-icon');
+                    const statusText = document.getElementById('status-text');
+                    const statusBadge = document.getElementById('api-status').querySelector('.badge');
+                    
+                    statusIcon.className = 'fas fa-circle text-danger';
+                    statusText.textContent = 'API Offline';
+                    statusBadge.className = 'badge bg-danger';
+                });
+        }
+
+        // Verificar status ao carregar a página e a cada 30 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            checkApiStatus();
+            setInterval(checkApiStatus, 30000);
+        });
+
+        // Auto-hide alerts após 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

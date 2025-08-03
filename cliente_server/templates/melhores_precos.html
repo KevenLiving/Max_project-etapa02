@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Melhores Preços - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-dollar-sign text-success me-2"></i>
+                Melhores Preços
+            </h1>
+            <div>
+                <form method="GET" class="d-inline">
+                    <select name="limite" onchange="this.form.submit()" class="form-select">
+                        <option value="10" {% if limite == 10 %}selected{% endif %}>Top 10</option>
+                        <option value="15" {% if limite == 15 %}selected{% endif %}>Top 15</option>
+                        <option value="20" {% if limite == 20 %}selected{% endif %}>Top 20</option>
+                        <option value="30" {% if limite == 30 %}selected{% endif %}>Top 30</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if produtos %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                Exibindo os {{ produtos|length }} produtos com os menores preços encontrados.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for produto in produtos %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 card-hover product-card border-success">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span class="badge bg-light text-success">#{{ loop.index }}</span>
+                    <strong>{{ formatar_preco(produto.preco) }}</strong>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title" title="{{ produto.nome }}">
+                        {{ produto.nome[:60] }}{% if produto.nome|length > 60 %}...{% endif %}
+                    </h6>
+                    
+                    {% if produto.avaliacao %}
+                    <div class="rating mb-2">
+                        {% for i in range(5) %}
+                            {% if i < produto.avaliacao %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-1">{{ "%.1f"|format(produto.avaliacao) }}</span>
+                        {% if produto.num_avaliacao %}
+                            <small class="text-muted">({{ produto.num_avaliacao }})</small>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="text-muted mb-2">
+                        <small>Sem avaliações</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <a href="{{ produto.link }}" target="_blank" class="btn btn-success btn-sm w-100">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Ver Oferta no ML
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-dollar-sign fa-5x text-muted mb-3"></i>
+                <h3 class="text-muted">Nenhum produto encontrado</h3>
+                <p class="text-muted mb-4">Realize uma busca para ver os melhores preços aqui.</p>
+                <a href="{{ url_for('buscar') }}" class="btn btn-success">
+                    <i class="fas fa-search me-2"></i>
+                    Fazer uma Busca
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

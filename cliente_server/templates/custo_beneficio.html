@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Custo-Benefício - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-balance-scale text-info me-2"></i>
+                Melhor Custo-Benefício
+            </h1>
+            <div>
+                <form method="GET" class="d-inline">
+                    <select name="limite" onchange="this.form.submit()" class="form-select">
+                        <option value="10" {% if limite == 10 %}selected{% endif %}>Top 10</option>
+                        <option value="15" {% if limite == 15 %}selected{% endif %}>Top 15</option>
+                        <option value="20" {% if limite == 20 %}selected{% endif %}>Top 20</option>
+                        <option value="30" {% if limite == 30 %}selected{% endif %}>Top 30</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if produtos %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                Produtos ordenados por melhor avaliação e menor preço - a combinação ideal!
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for produto in produtos %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 card-hover product-card border-info">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <span class="badge bg-light text-info">#{{ loop.index }}</span>
+                    <div class="d-flex align-items-center">
+                        {% if produto.avaliacao %}
+                        <div class="rating me-2">
+                            {% for i in range(5) %}
+                                {% if i < produto.avaliacao %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <strong>{{ formatar_preco(produto.preco) }}</strong>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title" title="{{ produto.nome }}">
+                        {{ produto.nome[:60] }}{% if produto.nome|length > 60 %}...{% endif %}
+                    </h6>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            {% if produto.avaliacao %}
+                            <small class="text-muted">
+                                <i class="fas fa-star text-warning me-1"></i>
+                                {{ "%.1f"|format(produto.avaliacao) }}/5
+                            </small>
+                            {% else %}
+                            <small class="text-muted">Sem avaliação</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-6 text-end">
+                            {% if produto.num_avaliacao %}
+                            <small class="text-muted">
+                                <i class="fas fa-users me-1"></i>
+                                {{ produto.num_avaliacao }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Indicador de custo-benefício -->
+                    <div class="mb-2">
+                        {% set score = 0 %}
+                        {% if produto.avaliacao and produto.preco %}
+                            {% if produto.avaliacao >= 4.5 and produto.preco <= 100 %}
+                                {% set score = 5 %}
+                            {% elif produto.avaliacao >= 4.0 and produto.preco <= 200 %}
+                                {% set score = 4 %}
+                            {% elif produto.avaliacao >= 3.5 and produto.preco <= 500 %}
+                                {% set score = 3 %}
+                            {% elif produto.avaliacao >= 3.0 %}
+                                {% set score = 2 %}
+                            {% else %}
+                                {% set score = 1 %}
+                            {% endif %}
+                        {% endif %}
+                        
+                        <small class="text-muted">Custo-Benefício:</small>
+                        <div class="custo-beneficio">
+                            {% for i in range(5) %}
+                                {% if i < score %}
+                                    <i class="fas fa-circle text-info"></i>
+                                {% else %}
+                                    <i class="far fa-circle text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <a href="{{ produto.link }}" target="_blank" class="btn btn-info btn-sm w-100">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Ver no ML
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-balance-scale fa-5x text-muted mb-3"></i>
+                <h3 class="text-muted">Nenhum produto encontrado</h3>
+                <p class="text-muted mb-4">Realize uma busca para ver os produtos com melhor custo-benefício aqui.</p>
+                <a href="{{ url_for('buscar') }}" class="btn btn-info">
+                    <i class="fas fa-search me-2"></i>
+                    Fazer uma Busca
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

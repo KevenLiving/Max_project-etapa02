@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">
+                <i class="fas fa-shopping-cart me-3"></i>
+                Mercado Livre Scraper
+            </h1>
+            <p class="lead">Interface web para buscar e analisar produtos do Mercado Livre</p>
+            <hr class="my-4">
+            <p>Realize buscas, compare preços e encontre os melhores produtos com facilidade.</p>
+            <a class="btn btn-light btn-lg" href="{{ url_for('buscar') }}" role="button">
+                <i class="fas fa-search me-2"></i>Começar Busca
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 card-hover text-center">
+            <div class="card-body">
+                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Buscar Produtos</h5>
+                <p class="card-text">Realize buscas por produtos no Mercado Livre e salve os resultados.</p>
+                <a href="{{ url_for('buscar') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i>Buscar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 card-hover text-center">
+            <div class="card-body">
+                <i class="fas fa-list fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Todos os Produtos</h5>
+                <p class="card-text">Visualize todos os produtos encontrados nas suas buscas.</p>
+                <a href="{{ url_for('produtos') }}" class="btn btn-success">
+                    <i class="fas fa-list me-1"></i>Ver Produtos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 card-hover text-center">
+            <div class="card-body">
+                <i class="fas fa-dollar-sign fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Melhores Preços</h5>
+                <p class="card-text">Encontre os produtos com os menores preços disponíveis.</p>
+                <a href="{{ url_for('melhores_precos') }}" class="btn btn-warning">
+                    <i class="fas fa-dollar-sign me-1"></i>Ver Preços
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 card-hover text-center">
+            <div class="card-body">
+                <i class="fas fa-star fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Melhores Avaliados</h5>
+                <p class="card-text">Produtos com as melhores avaliações dos usuários.</p>
+                <a href="{{ url_for('melhores_avaliados') }}" class="btn btn-info">
+                    <i class="fas fa-star me-1"></i>Ver Avaliações
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card card-hover">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    Custo-Benefício
+                </h5>
+                <p class="card-text">Encontre produtos que combinam boa avaliação com preço acessível.</p>
+                <a href="{{ url_for('custo_beneficio') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-balance-scale me-1"></i>Ver Custo-Benefício
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card card-hover">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-history text-secondary me-2"></i>
+                    Histórico de Buscas
+                </h5>
+                <p class="card-text">Veja todas as buscas que você já realizou no sistema.</p>
+                <a href="{{ url_for('buscas') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-history me-1"></i>Ver Histórico
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>Como usar
+            </h4>
+            <p>1. <strong>Busque produtos:</strong> Use a página de busca para encontrar produtos no Mercado Livre</p>
+            <p>2. <strong>Analise resultados:</strong> Visualize os produtos encontrados e compare preços e avaliações</p>
+            <p>3. <strong>Gerencie dados:</strong> Use a página de gerenciamento para limpar o banco de dados quando necessário</p>
+            <p class="mb-0">4. <strong>Monitore a API:</strong> O indicador no canto superior direito mostra o status da conexão com a API</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

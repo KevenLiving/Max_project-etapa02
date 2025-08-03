@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Buscas - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-history text-secondary me-2"></i>
+            Histórico de Buscas
+        </h1>
+    </div>
+</div>
+
+{% if buscas %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                Total de {{ buscas|length }} busca{% if buscas|length != 1 %}s{% endif %} realizada{% if buscas|length != 1 %}s{% endif %}.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for busca in buscas %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card card-hover">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">{{ busca.termo }}</h5>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <a href="{{ url_for('produtos') }}" class="btn btn-outline-primary btn-sm me-1">
+                                <i class="fas fa-list me-1"></i>
+                                Ver Produtos
+                            </a>
+                            <a href="{{ url_for('melhores_precos') }}" class="btn btn-outline-success btn-sm me-1">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                Preços
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <form method="POST" action="{{ url_for('limpar_banco') }}" class="d-inline" 
+                                  onsubmit="return confirm('Tem certeza que deseja remover todos os produtos da busca \'{{ busca.termo }}\'?')">
+                                <input type="hidden" name="termo" value="{{ busca.termo }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Limpar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('buscar') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-2"></i>
+                                Nova Busca
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('produtos') }}" class="btn btn-info w-100">
+                                <i class="fas fa-list me-2"></i>
+                                Ver Todos os Produtos
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('gerenciar') }}" class="btn btn-warning w-100">
+                                <i class="fas fa-cog me-2"></i>
+                                Gerenciar Banco
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-history fa-5x text-muted mb-3"></i>
+                <h3 class="text-muted">Nenhuma busca encontrada</h3>
+                <p class="text-muted mb-4">Você ainda não realizou nenhuma busca. Que tal começar agora?</p>
+                <a href="{{ url_for('buscar') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search me-2"></i>
+                    Fazer Primeira Busca
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

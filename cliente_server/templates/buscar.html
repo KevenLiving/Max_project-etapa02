@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Produtos - Mercado Livre Scraper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-search text-primary me-2"></i>
+            Buscar Produtos
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    Nova Busca
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="search-form">
+                    <div class="mb-3">
+                        <label for="termo" class="form-label">
+                            <i class="fas fa-tag me-1"></i>
+                            Termo de Busca
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="termo" 
+                               name="termo" 
+                               placeholder="Ex: smartphone, notebook, tênis..."
+                               required>
+                        <div class="form-text">Digite o nome do produto que você deseja buscar</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="limite" class="form-label">
+                            <i class="fas fa-list-ol me-1"></i>
+                            Limite de Produtos
+                        </label>
+                        <select class="form-select" id="limite" name="limite">
+                            <option value="10">10 produtos</option>
+                            <option value="15" selected>15 produtos</option>
+                            <option value="20">20 produtos</option>
+                            <option value="30">30 produtos</option>
+                            <option value="50">50 produtos</option>
+                        </select>
+                        <div class="form-text">Quantidade máxima de produtos para buscar</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="search-btn">
+                            <i class="fas fa-search me-2"></i>
+                            Realizar Busca
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+            <h5 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Importante
+            </h5>
+            <ul class="mb-0">
+                <li>A busca pode demorar alguns minutos dependendo da quantidade de produtos</li>
+                <li>Os produtos serão salvos no banco de dados para consulta posterior</li>
+                <li>Certifique-se de que a API está online (verifique o indicador no canto superior direito)</li>
+                <li>Buscas por termos já pesquisados irão sobrescrever os resultados anteriores</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3 class="mb-3">
+            <i class="fas fa-lightbulb text-warning me-2"></i>
+            Dicas para Buscas Eficazes
+        </h3>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-check-circle text-success me-1"></i>
+                            Use termos específicos
+                        </h6>
+                        <p class="card-text small">
+                            "iPhone 15" é melhor que apenas "celular"
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-check-circle text-success me-1"></i>
+                            Evite caracteres especiais
+                        </h6>
+                        <p class="card-text small">
+                            Use palavras simples sem acentos quando possível
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-check-circle text-success me-1"></i>
+                            Teste variações
+                        </h6>
+                        <p class="card-text small">
+                            "notebook gamer" ou "laptop gamer" podem ter resultados diferentes
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-check-circle text-success me-1"></i>
+                            Ajuste o limite
+                        </h6>
+                        <p class="card-text small">
+                            Mais produtos = mais opções, mas busca mais demorada
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('search-form').addEventListener('submit', function(e) {
+    const btn = document.getElementById('search-btn');
+    const termo = document.getElementById('termo').value;
+    const limite = document.getElementById('limite').value;
+    
+    // Mostrar loading
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Buscando...';
+    btn.disabled = true;
+    
+    // Mostrar alerta de progresso
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-info mt-3';
+    alertDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <div>
+                <strong>Busca em andamento...</strong><br>
+                <small>Buscando "${termo}" (${limite} produtos). Por favor, aguarde...</small>
+            </div>
+        </div>
+    `;
+    
+    document.querySelector('.card-body').appendChild(alertDiv);
+});
+</script>
+{% endblock %}
