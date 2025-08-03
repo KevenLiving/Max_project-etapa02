@@ -62,7 +62,7 @@ POST /buscar-produtos/?termo=iphone&limite=10
 
 Lista todos os produtos salvos no banco de dados.
 
-### Parâmetros de query (recomendado adicionar):
+### Parâmetros de query:
 
 - `skip` (int, padrão=0): número de registros a pular (paginação).
 - `limit` (int, padrão=20): número máximo de registros a retornar.
